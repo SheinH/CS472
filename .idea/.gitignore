@@ -1,3 +1,12 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
 # C++ objects and libs
 *.slo
 *.lo
@@ -52,14 +61,3 @@ compile_commands.json
 *creator.user*
 
 *_qmlcache.qrc
-
-.vs
-debug
-release
-*.db
-*.sln
-*.opendb
-*.stash
-*.vcxproj*
-Make*
-*.app

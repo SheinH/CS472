@@ -1,0 +1,35 @@
+<RCC>
+    <qresource>
+	<file>hw0/vshader0c.glsl</file>
+	<file>hw0/fshader0c.glsl</file>
+	<file>hw0/vshader0d.glsl</file>
+	<file>hw0/fshader0d.glsl</file>
+	<file>hw2/vshader2a.glsl</file>
+	<file>hw2/fshader2a.glsl</file>
+	<file>hw2/vshader2b.glsl</file>
+	<file>hw2/fshader2b.glsl</file>
+	<file>hw3/vshader3a1.glsl</file>
+	<file>hw3/fshader3a1.glsl</file>
+	<file>hw3/vshader3a2.glsl</file>
+	<file>hw3/fshader3a2.glsl</file>
+	<file>hw3/vshader3b1.glsl</file>
+	<file>hw3/fshader3b1.glsl</file>
+	<file>hw3/vshader3b2.glsl</file>
+	<file>hw3/fshader3b2.glsl</file>
+	<file>hw3/vshader3b3.glsl</file>
+	<file>hw3/fshader3b3.glsl</file>
+	<file>hw3/vshader3b4.glsl</file>
+	<file>hw3/fshader3b4.glsl</file>
+	<file>hw3/vshader3b5.glsl</file>
+	<file>hw3/fshader3b5.glsl</file>
+	<file>hw4/vshader4c1.glsl</file>
+	<file>hw4/fshader4c1.glsl</file>
+	<file>hw4/vshader4c2.glsl</file>
+	<file>hw4/fshader4c2.glsl</file>
+	<file>hw4/vshader4c3.glsl</file>
+	<file>hw4/fshader4c3.glsl</file>
+	<file>mandrill.jpg</file>
+	<file>earth.jpg</file>
+	<file>sun.jpg</file>
+    </qresource>
+</RCC>
