@@ -16,7 +16,7 @@
 // standard include files
 //
 
-class HW1a : public HW 
+class HW1a : public HW
 {
 	Q_OBJECT
 public:
