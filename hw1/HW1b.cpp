@@ -7,6 +7,7 @@
 // Written by: George Wolberg, 2022
 // ===============================================================
 
+#include <array>
 #include "HW1b.h"
 
 
@@ -24,7 +25,6 @@ HW1b::HW1b(const QGLFormat &glf, QWidget *parent)
 	m_updateColor	= 1;
 	m_twist		= 1;
 }
-
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,7 +55,22 @@ HW1b::initializeGL()
 void
 HW1b::resizeGL(int w, int h)
 {
-	// PUT YOUR CODE HERE
+    // compute aspect ratio
+    float ar = (float) w / h;
+    // set xmax, ymax
+    float xmax, ymax;
+    if (ar > 1.0) { // wide screen
+        xmax = ar;
+        ymax = 1.;
+    } else { // tall screen
+        xmax = 1.;
+        ymax = 1 / ar;
+    }
+    // set viewport to occupy full canvas
+    glViewport(0, 0, w, h);
+    // init viewing coordinates for orthographic projection
+    glLoadIdentity();
+    glOrtho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
 }
 
 
@@ -68,7 +83,16 @@ HW1b::resizeGL(int w, int h)
 void
 HW1b::paintGL()
 {
-	// PUT YOUR CODE HERE
+    glClear(GL_COLOR_BUFFER_BIT);
+    for (size_t i = 0; i < m_colors.size(); ++i) {
+        glColor3f(m_colors[i][0], m_colors[i][1], m_colors[i][2]);
+        glBegin(GL_TRIANGLES);
+        for (int j = 0; j < 3; ++j) {
+            auto index = i * 3 + j;
+            glVertex2f(m_points[index][0], m_points[index][1]);
+        }
+        glEnd();
+    }
 }
 
 
@@ -135,7 +159,6 @@ HW1b::controlPanel()
 }
 
 
-
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // HW1b::reset:
 //
@@ -196,18 +219,45 @@ HW1b::initBuffers()
 }
 
 
-
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // HW1b::divideTriangle:
 //
 // Recursive subdivision of triangle (a,b,c). Recurse count times.
 //
-void
-HW1b::divideTriangle(vec2 a, vec2 b, vec2 c, int count)
-{
-	// PUT YOUR CODE HERE
+
+typedef std::array<vec2,3> Triangle;
+
+vec2 midpoint(vec2 a, vec2 b) {
+    return (a + b) / 2.f;
 }
 
+void subdivideTriangleIntoFour(const Triangle &t, QList<Triangle> &list) {
+    vec2 midpoints[] = {
+            midpoint(t[0], t[1]),
+            midpoint(t[1], t[2]),
+            midpoint(t[2], t[0])
+    };
+    for (int i = 0; i < 3; ++i) {
+        list.push_back({t[i], midpoints[i], midpoints[(i + 2) % 3]});
+    }
+    list.push_back({midpoints[0], midpoints[1], midpoints[2]});
+}
+
+void
+HW1b::divideTriangle(vec2 a, vec2 b, vec2 c, int count) {
+    QList<Triangle> triangles = {{a, b, c}};
+    for (; count > 0; count--) {
+        QList<Triangle> newTriangles;
+        newTriangles.reserve(triangles.size() * 4);
+        for (const Triangle &t: triangles) {
+            subdivideTriangleIntoFour(t, newTriangles);
+        }
+        triangles = newTriangles;
+    }
+    for (const Triangle &t: triangles) {
+        triangle(t[0], t[1], t[2]);
+    }
+}
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
