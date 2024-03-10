@@ -40,6 +40,7 @@ private:
 	int		 m_winW;			// window width
 	int		 m_winH;			// window height
 	int		 m_vertNum;			// number of vertices
+        GLuint vertexBuffer;        // buffer id accessible for paintGL
 	QMatrix4x4	 m_projection;			// 4x4 projection matrix
 };
 
