@@ -72,6 +72,21 @@ void
 HW2a::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE HERE
+	m_winW = w;
+	m_winH = h;
+	float ar = (float)w / h;
+	float   x_max;
+	float   y_max;
+	if (ar > 1.0) {		// wide screen
+		x_max = ar;
+		y_max = 1.;
+	}
+	else {		// tall screen
+		x_max = 1.;
+		y_max = 1 / ar;
+	}
+	m_projection.setToIdentity();
+	m_projection.ortho(-x_max, x_max, -y_max, y_max, -1.0, 1.0);
 }
 
 
@@ -112,7 +127,28 @@ HW2a::paintGL()
 
 	// use glsl program
 	// PUT YOUR CODE HERE
+    
+	// enable the vertex buffer
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, 0);
+	glEnableVertexAttribArray(ATTRIB_VERTEX);
 
+
+	glUseProgram(m_program[HW2A].programId());
+
+	// pass projection matrix to shader
+	glUniformMatrix4fv(m_uniform[HW2A][PROJ], 1, GL_FALSE, m_projection.constData());
+
+	int drawModeNum = 0;
+	for (int row = 0; row < 3; ++row) {
+		for (int col = 0; col < 3; ++col) {
+			glViewport(col * w, row * h, w, h); // scale viewport coordinates with row, col
+			glDrawArrays(DrawModes[drawModeNum], 0, m_vertNum);
+			drawModeNum++;
+		}
+	}
+	glUseProgram(0);
+	glDisableVertexAttribArray(ATTRIB_VERTEX);
 	// disable vertex shader point size adjustment
 	glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
 }
@@ -198,12 +234,12 @@ HW2a::initVertexBuffer()
 	m_vertNum = (int) v.size() / 2;
 
 	// create a vertex buffer
-	GLuint vertexBuffer;
+	// GLuint vertexBuffer; --> moved to header file
 	glGenBuffers(1, &vertexBuffer);
 
 	// bind vertex buffer to the GPU and copy the vertices from CPU to GPU
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, v.size()*sizeof(float), &v[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer); //vertex active
+	glBufferData(GL_ARRAY_BUFFER, v.size()*sizeof(float), &v[0], GL_STATIC_DRAW); //copies to GPU
 
 	// enable vertex buffer to be accessed via the attribute vertex variable and specify data format
 	glEnableVertexAttribArray(ATTRIB_VERTEX);
