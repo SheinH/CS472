@@ -101,30 +101,18 @@ HW2b::resizeGL(int w, int h)
 void
 HW2b::paintGL()
 {
-	// PUT YOUR CODE HERE
-	glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glUseProgram(m_program[HW2B].programId());
 
-	// adjust point size
-	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    // Pass uniform values
+    glUniformMatrix4fv(m_uniform[HW2B][PROJ], 1, GL_FALSE, m_projection.constData());
+    glUniformMatrix4fv(m_uniform[HW2B][MV], 1, GL_FALSE, m_modelview.constData());
+    glUniform1i(m_uniform[HW2B][TWIST], m_twist);
+    glUniform1f(m_uniform[HW2B][THETA], m_theta);
 
+    glDrawArrays(GL_TRIANGLES, 0, m_numPoints);
 
-	// offset not applicable to color
-
-
-	glUseProgram(m_program[HW2B].programId());
-
-		// pass projection and modelView matrix to shader
-		glUniformMatrix4fv(m_uniform[HW2B][PROJ], 1, GL_FALSE, m_projection.constData());
-		glUniformMatrix4fv(m_uniform[HW2B][MV], 1, GL_FALSE, m_modelview.constData());
-		glUniform1i(m_uniform[HW2B][TWIST], m_twist);
-		glUniform1f(m_uniform[HW2B][THETA], m_theta);
-
-		glDrawArrays(GL_TRIANGLES, 0, m_numPoints);
-
-	glUseProgram(0);
-
-	// disable vertex shader point size adjustment
-	glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    glUseProgram(0);
 }
 
 
@@ -268,6 +256,7 @@ HW2b::initShaders()
 void
 HW2b::initVertexBuffer()
 {
+    //Disable buffers before changing them
     glDisableVertexAttribArray(ATTRIB_VERTEX);
     glDisableVertexAttribArray(ATTRIB_COLOR);
 	// init geometry data
@@ -282,28 +271,25 @@ HW2b::initVertexBuffer()
 	divideTriangle(vertices[0], vertices[1], vertices[2], m_subdivisions);
 	m_numPoints = (int)m_points.size();		// save number of vertices
 
+    //Make the vertex buffer
 	glGenBuffers(1, &m_vertexBuffer);
-	// bind vertex buffer to the GPU and copy the vertices from CPU to GPU
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, m_numPoints * sizeof(vec2), &m_points[0], GL_STATIC_DRAW);
+    // enable vertex buffer immediately
+    glEnableVertexAttribArray(ATTRIB_VERTEX);
+    glVertexAttribPointer	 (ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, NULL);
 
+    // Make color buffer
 	glGenBuffers(1, &m_colorBuffer);
-	// bind color buffer to the GPU and copy the colors from CPU to GPU
 	glBindBuffer(GL_ARRAY_BUFFER, m_colorBuffer);
 	glBufferData(GL_ARRAY_BUFFER, m_numPoints * sizeof(vec3), &m_colors[0], GL_STATIC_DRAW);
-
-	// enable vertex buffer to be accessed via the attribute vertex variable and specify data format
-	glEnableVertexAttribArray(ATTRIB_VERTEX);
-	glVertexAttribPointer	 (ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, 0);
-
+    // enable color buffer immediately
 	glVertexAttribPointer(ATTRIB_COLOR, 3, GL_FLOAT, false, 0, NULL);
 	glEnableVertexAttribArray(ATTRIB_COLOR);
 
 	// clear vertex and color vectors because they have already been copied into GPU
 	m_points.clear();
 	m_colors.clear();
-	/* Why doesn't he clear the buffer here too? */
-	//glBindBuffer(GL_ARRAY_BUFFER, 0); --> triangles disappear, that's why :)
 }
 
 

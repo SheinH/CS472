@@ -13,8 +13,9 @@ uniform	int	u_Twist;	// Twist flag
 void main() 
 {
     float d = bool(u_Twist) ? sqrt(a_Position.x * a_Position.x + a_Position.y * a_Position.y) : 1;
-    float sinTheta = sin(d*u_Theta);
-    float cosTheta = cos(d*u_Theta);
-    gl_Position = u_Projection*u_Modelview *vec4(a_Position.x*cosTheta - a_Position.y*sinTheta, a_Position.x*sinTheta + a_Position.y*cosTheta, 0, 1);
+    float sinTheta = sin(d * u_Theta);
+    float cosTheta = cos(d * u_Theta);
+    gl_Position = u_Projection * u_Modelview * vec4(a_Position.x * cosTheta - a_Position.y * sinTheta,
+                                                    a_Position.x * sinTheta + a_Position.y * cosTheta, 0, 1);
     v_Color = vec4(a_Color, 1);
 }
