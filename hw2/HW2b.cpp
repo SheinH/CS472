@@ -109,13 +109,6 @@ HW2b::paintGL()
 
 
 	// offset not applicable to color
-    glBindBuffer(GL_ARRAY_BUFFER, m_colorBuffer);
-	glVertexAttribPointer(ATTRIB_COLOR, 3, GL_FLOAT, false, 0, NULL);
-	glEnableVertexAttribArray(ATTRIB_COLOR);
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, NULL);
-    glEnableVertexAttribArray(ATTRIB_VERTEX);
 
 
 	glUseProgram(m_program[HW2B].programId());
@@ -129,8 +122,6 @@ HW2b::paintGL()
 		glDrawArrays(GL_TRIANGLES, 0, m_numPoints);
 
 	glUseProgram(0);
-	glDisableVertexAttribArray(ATTRIB_VERTEX);
-	glDisableVertexAttribArray(ATTRIB_COLOR);
 
 	// disable vertex shader point size adjustment
 	glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -277,6 +268,8 @@ HW2b::initShaders()
 void
 HW2b::initVertexBuffer()
 {
+    glDisableVertexAttribArray(ATTRIB_VERTEX);
+    glDisableVertexAttribArray(ATTRIB_COLOR);
 	// init geometry data
 	const vec2 vertices[] = {
 		vec2(0.0f,   0.75f),
