@@ -123,25 +123,50 @@ HW3a::paintGL()
 	// bind vertex buffer to the GPU; enable buffer to be copied to the
 	// attribute vertex variable and specify data format
 	// PUT YOUR CODE HERE
-
+        glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glEnableVertexAttribArray(ATTRIB_VERTEX);
+	glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, NULL);
+	
 	// bind texture coord buffer to the GPU; enable buffer to be copied to the
 	// attribute texture coordinate variable and specify data format
 	// PUT YOUR CODE HERE
-
+        glBindBuffer(GL_ARRAY_BUFFER, m_texBuffer);
+	glEnableVertexAttribArray(ATTRIB_TEXCOORD);
+	glVertexAttribPointer(ATTRIB_TEXCOORD, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	
 	// use texture glsl program
 	// PUT YOUR CODE HERE
+	glUseProgram(m_program[TEXTURE].programId());
 
 	// pass parameters to vertex shader
 	// PUT YOUR CODE HERE
+	glUniformMatrix4fv(m_uniform[TEXTURE][PROJ], 1, GL_FALSE, m_projection.constData());
+	glUniformMatrix4fv(m_uniform[TEXTURE][MV], 1, GL_FALSE, m_modelview.constData());
+	glUniform1i(m_uniform[TEXTURE][TWIST], m_twist);
+	glUniform1f(m_uniform[TEXTURE][THETA], m_theta);
 
 	// draw texture mapped triangles
 	// PUT YOUR CODE HERE
+	glDrawArrays(GL_TRIANGLES, 0, m_numPoints);
 
 	glLineWidth(1.5f);
+
+	glUseProgram(0);
 
 	// draw wireframe, if necessary
 	if(m_wire) {
 		// PUT YOUR CODE HERE
+		glUseProgram(m_program[WIREFRAME].programId());
+
+		glUniformMatrix4fv(m_uniform[WIREFRAME][PROJ], 1, GL_FALSE, m_projection.constData());
+		glUniformMatrix4fv(m_uniform[WIREFRAME][MV], 1, GL_FALSE, m_modelview.constData());
+		glUniform1i(m_uniform[WIREFRAME][TWIST], m_twist);
+		glUniform1f(m_uniform[WIREFRAME][THETA], m_theta);
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glDrawArrays(GL_TRIANGLES, 0, m_numPoints);
+
+		glUseProgram(0);
 	}
 }
 
@@ -345,6 +370,23 @@ HW3a::initVertexBuffer()
 	};
 
 	// PUT YOUR CODE HERE
+	divideTriangle(vertices[0], vertices[1], vertices[2], m_subdivisions);
+	m_numPoints = (int)m_points.size();		// save number of vertices
+	int m_numCoords = (int)m_coords.size();
+
+	//Make the vertex buffer
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, m_numPoints * sizeof(vec2), &m_points[0], GL_STATIC_DRAW);
+
+	// Make texture buffer with coordinates
+	glGenBuffers(1, &m_texBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_texBuffer);
+	glBufferData(GL_ARRAY_BUFFER, m_numCoords * sizeof(vec2), &m_coords[0], GL_STATIC_DRAW);
+
+	// clear vertex and texture vectors because they have already been copied into GPU
+	m_points.clear();
+	m_coords.clear();
 }
 
 
@@ -358,6 +400,16 @@ void
 HW3a::divideTriangle(vec2 a, vec2 b, vec2 c, int count)
 {
 	// PUT YOUR CODE HERE
+	if (count > 0) {
+	vec2 ab = vec2((a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0);
+	vec2 ac = vec2((a[0] + c[0]) / 2.0, (a[1] + c[1]) / 2.0);
+	vec2 bc = vec2((b[0] + c[0]) / 2.0, (b[1] + c[1]) / 2.0);
+	divideTriangle(a, ab, ac, count - 1);
+	divideTriangle(b, bc, ab, count - 1);
+	divideTriangle(c, ac, bc, count - 1);
+	divideTriangle(ab, ac, bc, count - 1);
+	}
+	else triangle(a, b, c);
 }
 
 
