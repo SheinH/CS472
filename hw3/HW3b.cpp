@@ -2,6 +2,10 @@
 // Computer Graphics Homework Solutions
 // Copyright (C) 2022 by George Wolberg
 //
+// ===============================================================
+// Computer Graphics Homework Solutions
+// Copyright (C) 2022 by George Wolberg
+//
 // HW3b.cpp - HW3b class
 //
 // Written by: George Wolberg, 2022
@@ -130,7 +134,7 @@ HW3b::resizeGL(int w, int h)
 	// init viewing coordinates for orthographic projection
 	m_projection.setToIdentity();
 	// stole textbook numbers :)
-	m_projection.perspective(60.0, ar, 0.1, 1000.0);
+	m_projection.perspective(45.0, ar, 0.1, 1000.0);
 }
 
 
@@ -195,9 +199,7 @@ HW3b::paintGL()
 		glUniformMatrix4fv(m_uniform[WIRE_SHADER][VIEW], 1, GL_FALSE, m_camera->view().constData());
 		glUniformMatrix4fv(m_uniform[WIRE_SHADER][PROJ], 1, GL_FALSE, m_projection.constData());
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuffer[0]);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDrawElements(GL_TRIANGLE_STRIP, (GLsizei)m_indices_wireframe.size(), GL_UNSIGNED_SHORT, 0);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_LINES, (GLsizei)m_indices_wireframe.size(), GL_UNSIGNED_SHORT, 0);
 		break;
 
 	case FLAT_COLOR:
