@@ -110,6 +110,27 @@ void
 HW3b::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE (use perspective projection)
+	// Need: fovy, aspect ratio, near, far
+
+	// compute aspect ratio
+	float ar = (float)w / h;
+	float xmax, ymax;
+	if (ar > 1.0) {		// wide screen
+		xmax = ar;
+		ymax = 1.;
+	}
+	else {			// tall screen
+		xmax = 1.;
+		ymax = 1 / ar;
+	}
+
+	// set viewport to occupy full canvas
+	glViewport(0, 0, w, h);
+
+	// init viewing coordinates for orthographic projection
+	m_projection.setToIdentity();
+	// stole textbook numbers :)
+	m_projection.perspective(45.0, ar, 0.1, 1000.0);
 }
 
 
@@ -156,12 +177,27 @@ HW3b::paintGL()
 	case TEXTURED:
 		// draw textured surface
 		// PUT YOUR CODE HERE
+		glBindTexture(GL_TEXTURE_2D, m_texture);
+		glUseProgram(m_program[TEX_SHADER].programId());
+		glUniformMatrix4fv(m_uniform[TEX_SHADER][VIEW], 1, GL_FALSE, m_camera->view().constData());
+		glUniformMatrix4fv(m_uniform[TEX_SHADER][PROJ], 1, GL_FALSE, m_projection.constData());
+		glUniform1i(m_uniform[SMOOTH_TEX][SAMPLER], 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuffer[0]);
+		glDrawElements(GL_TRIANGLE_STRIP, (GLsizei)m_indices_triangles.size(), GL_UNSIGNED_SHORT, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		if(m_displayMode != TEXTURED_WIREFRAME)
 			break;
+
 	case WIREFRAME:
 		// draw wireframe
 		// PUT YOUR CODE HERE
+		glUseProgram(m_program[WIRE_SHADER].programId());
+		glUniformMatrix4fv(m_uniform[WIRE_SHADER][VIEW], 1, GL_FALSE, m_camera->view().constData());
+		glUniformMatrix4fv(m_uniform[WIRE_SHADER][PROJ], 1, GL_FALSE, m_projection.constData());
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuffer[0]);
+		glDrawElements(GL_LINES, (GLsizei)m_indices_wireframe.size(), GL_UNSIGNED_SHORT, 0);
 		break;
+
 	case FLAT_COLOR:
 		glUseProgram(m_program[FLAT_SHADER].programId());	
 		glUniformMatrix4fv(m_uniform[FLAT_SHADER][VIEW ], 1, GL_FALSE, m_camera->view().constData());
@@ -170,6 +206,7 @@ HW3b::paintGL()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuffer[0]);
 		glDrawElements(GL_TRIANGLE_STRIP, (GLsizei) m_indices_triangles.size(), GL_UNSIGNED_SHORT, 0);
 		break;
+
 	case SMOOTH_COLOR:
 		glUseProgram(m_program[SMOOTH_SHADER].programId());	
 		glUniformMatrix4fv(m_uniform[SMOOTH_SHADER][VIEW ], 1, GL_FALSE, m_camera->view().constData());
@@ -178,6 +215,7 @@ HW3b::paintGL()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuffer[0]);
 		glDrawElements(GL_TRIANGLE_STRIP, (GLsizei) m_indices_triangles.size(), GL_UNSIGNED_SHORT, 0);
 		break;
+
 	case SMOOTH_TEXTURE:
 		glBindTexture(GL_TEXTURE_2D, m_texture);
 		glUseProgram(m_program[SMOOTH_TEX].programId());	
@@ -363,6 +401,8 @@ HW3b::resetMesh()
 				break;
 			case HOLE:
 				// PUT YOUR CODE HERE
+				// inverse of the middle block
+				vec.setZ((i >= (m_grid / 3) && i <= (2 * m_grid / 3) && j >= (m_grid / 3) && j <= (2 * m_grid / 3)) ? 0.0f : 0.50f);
 				break;
 			case DIAGONALWALL:
 				// PUT YOUR CODE HERE
@@ -375,6 +415,8 @@ HW3b::resetMesh()
 				break;
 			case MIDDLEBLOCK:
 				// PUT YOUR CODE HERE
+				// Each coordinte falls in the middle of the grid
+				vec.setZ((i >= (m_grid / 3) && i <= (2 * m_grid/ 3) && j >= (m_grid / 3) && j <= (2 * m_grid/ 3)) ? 0.50f : 0.0f);
 				break;
 			case CORNERBLOCK:
 				// PUT YOUR CODE HERE
