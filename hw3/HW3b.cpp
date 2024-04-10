@@ -194,7 +194,7 @@ HW3b::paintGL()
 		glUseProgram(m_program[WIRE_SHADER].programId());
 		glUniformMatrix4fv(m_uniform[WIRE_SHADER][VIEW], 1, GL_FALSE, m_camera->view().constData());
 		glUniformMatrix4fv(m_uniform[WIRE_SHADER][PROJ], 1, GL_FALSE, m_projection.constData());
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuffer[0]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuffer[1]);
 		glDrawElements(GL_LINES, (GLsizei)m_indices_wireframe.size(), GL_UNSIGNED_SHORT, 0);
 		break;
 
@@ -406,20 +406,25 @@ HW3b::resetMesh()
 				break;
 			case DIAGONALWALL:
 				// PUT YOUR CODE HERE
+				vec.setZ(((i + j) == m_grid) ? 0.50f : 0.0f);
 				break;
 			case SIDEWALL:
 				// PUT YOUR CODE HERE
+				vec.setZ((i == 1) ? 0.50f : 0.0f);
 				break;
 			case DIAGONALBLOCK:
 				// PUT YOUR CODE HERE
+				vec.setZ(((i + j) >= m_grid) ? 0.50f : 0.0f);
 				break;
 			case MIDDLEBLOCK:
 				// PUT YOUR CODE HERE
-				// Each coordinte falls in the middle of the grid
+				// Each coordinate falls in the middle of the grid
 				vec.setZ((i >= (m_grid / 3) && i <= (2 * m_grid/ 3) && j >= (m_grid / 3) && j <= (2 * m_grid/ 3)) ? 0.50f : 0.0f);
 				break;
 			case CORNERBLOCK:
 				// PUT YOUR CODE HERE
+				// Same as middle block w/o boundary conditions;
+				vec.setZ((i >= (2 * m_grid / 3) && j >= (2 * m_grid / 3) ? 0.5f : 0.0f));
 				break;
 			case HILL:
 				// PUT YOUR CODE HERE
