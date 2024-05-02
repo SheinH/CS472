@@ -285,7 +285,7 @@ HW4a::paintGL()
 
 	// apply translate_sun to top of stack
 	// PUT YOUR CODE HERE
-	mvStack.push(translate_sun);
+	mvStack.top() *= rotate_sun;
 
 	// duplicate top of stack
 	// PUT YOUR CODE HERE
