@@ -285,7 +285,7 @@ HW4a::paintGL()
 
 	// apply translate_sun to top of stack
 	// PUT YOUR CODE HERE
-	mvStack.top() *= rotate_sun;
+    mvStack.top() *= translate_sun;
 
 	// duplicate top of stack
 	// PUT YOUR CODE HERE
@@ -295,9 +295,10 @@ HW4a::paintGL()
 	QMatrix4x4 rotate_sun;
 	rotate_sun.rotate(m_angle*Radian2Deg / 2.0f, vec3(0, 1, 0));
 
+
 	// apply sun rotation to top of stack
 	// PUT YOUR CODE HERE
-	mvStack.push(rotate_sun);
+    mvStack.top() *= rotate_sun;
 
 	// display sun according to display mode
 	glUniformMatrix4fv(m_uniform[m_displayMode][VIEW], 1, GL_FALSE, mvStack.top().constData());
@@ -479,4 +480,3 @@ HW4a::changeDisplay(int val)
 	m_displayMode = val;
 	updateGL();
 }
-
